@@ -4,8 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ARLocation/Samples/ARLocation Place At Locations.unity
+    guid: 4d2175edcfda79b4cbe8c129b88a69a2
   m_configObjects:
-    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 1899d39420fab48cda3faa0d9570be92, type: 2}
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 752a86d6f84250940a1a4bcd8ec0f511, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 941884aaa39524c61a3a84adf6a8ad1a, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: eece67b60de73400694472ec3365da16, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d6ef38d4de67f9f43b3f6770bd81fbec, type: 2}
