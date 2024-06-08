@@ -11,4 +11,5 @@
     <!--This was added by the AnalyticsFixPropertyRemover. If you want to prevent the generation of this, have "AnalyticsFixPropertyRemover" included in a comment-->
     <property tools:node="removeAll" />
   </application>
+  <uses-permission android:name="android.permission.CAMERA" />
 </manifest>
