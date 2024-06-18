@@ -19,6 +19,10 @@ public class LikeController : MonoBehaviour
 
     public void RemoveLike()
     {
+        if (LikesCount == 0)
+        {
+            return;
+        }
         LikesCount = LikesCount - 1;
     }
 }
