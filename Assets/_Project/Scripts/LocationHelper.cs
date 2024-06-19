@@ -55,7 +55,7 @@ public class LocationHelper
 [Serializable]
 public class SavedModel
 {
-    public string SavedPath { get; set; }
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
+    public string SavedPath;
+    public double Latitude;
+    public double Longitude;
 }

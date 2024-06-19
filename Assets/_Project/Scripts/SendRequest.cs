@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using Mapbox.Unity.Location;
 
 public class SendRequest : MonoBehaviour
 {
@@ -17,48 +18,42 @@ public class SendRequest : MonoBehaviour
     public Text LoadingText;
     public GameObject PublishObject;
     public GameObject OtherUIObject;
-    public PlaceAtLocation.PlaceAtOptions PlacementOptions;
-    private bool loading = false;
     public bool isLike = false;
+
+    private bool loading = false;
     private string resultId = "";
 
-    void Start()
+    private void Start()
     {
-        if (isLike)
-        {
-            List<SavedModel> models = new List<SavedModel>();
-            if (PlayerPrefs.HasKey("MODELS"))
-            {
-                models = new List<SavedModel>(PlayerPrefs.GetString("MODELS").Split(',').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
-            }
-            if (models.Count == 0)
-            {
-                return;
-            }
+        if (!isLike) return;
 
-            var currentLocation = ARLocationProvider.Instance.Provider.CurrentLocation;
-            var nearestModel = LocationHelper.FindNearestModel(currentLocation.latitude, currentLocation.longitude, models);
-            byte[] file = File.ReadAllBytes(nearestModel.SavedPath);
-            var arObject = Importer.LoadFromBytes(file);
-            arObject.transform.localScale = new Vector3(-1, 1, 1);
-            var newLocation = new Location()
-            {
-                Latitude = nearestModel.Latitude,
-                Longitude = nearestModel.Longitude,
-                AltitudeMode = AltitudeMode.DeviceRelative
-            };
-            PlaceAtLocation.CreatePlacedInstance(arObject, newLocation, PlacementOptions, false);
-        }
+        List<SavedModel> models = new List<SavedModel>();
+        if (PlayerPrefs.HasKey("saved_models"))
+            models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
+        if (models.Count == 0) return;
+
+        var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.LatitudeLongitude;
+        var nearestModel = LocationHelper.FindNearestModel(currentLocation[0], currentLocation[1], models);
+        Debug.Log($"{nearestModel.Latitude} {nearestModel.Longitude}  {nearestModel.SavedPath}");
+        byte[] file = File.ReadAllBytes(nearestModel.SavedPath);
+        var arObject = Importer.LoadFromBytes(file);
+        arObject.transform.localScale = new Vector3(-1, 1, 1);
+        var newLocation = new ARLocation.Location()
+        {
+            Latitude = nearestModel.Latitude,
+            Longitude = nearestModel.Longitude,
+            AltitudeMode = AltitudeMode.DeviceRelative
+        };
+        PlaceAtLocation.CreatePlacedInstance(arObject, newLocation, new PlaceAtLocation.PlaceAtOptions(), false);
+
     }
 
-    void Update()
+    private void Update()
     {
-        LoadingObject.SetActive(loading);
-        if (loading)
-        {
-            OtherUIObject.SetActive(false);
-        }
+        if (isLike) return;
 
+        LoadingObject.SetActive(loading);
+        if (loading) OtherUIObject.SetActive(false);
     }
 
     public void OpenGenerateDialog()
@@ -126,33 +121,32 @@ public class SendRequest : MonoBehaviour
                 Debug.Log(savedPath);
                 File.WriteAllBytes(savedPath, modelWww.downloadHandler.data);
                 var models = new List<SavedModel>();
-                var currentLocation = ARLocationProvider.Instance.Provider.CurrentLocation;
-                if (PlayerPrefs.HasKey("MODELS"))
+                var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.LatitudeLongitude;
+                if (PlayerPrefs.HasKey("saved_models"))
                 {
-                    models = new List<SavedModel>(PlayerPrefs.GetString("MODELS").Split(',').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
+                    models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
                 }
-                var newSavedModel = new SavedModel()
+                var savedModel = new SavedModel()
                 {
                     SavedPath = savedPath,
-                    Latitude = currentLocation.latitude,
-                    Longitude = currentLocation.longitude,
+                    Latitude = currentLocation[0],
+                    Longitude = currentLocation[1],
                 };
-                models.Add(newSavedModel);
-                var list = String.Join(",", models.Select((e) => JsonUtility.ToJson(e)));
-                PlayerPrefs.SetString("MODELS", list);
+                models.Add(savedModel);
+                var list = String.Join("|", models.Select((e) => JsonUtility.ToJson(e)));
+                PlayerPrefs.SetString("saved_models", list);
                 PlayerPrefs.Save();
 
                 LoadingText.text = "Отображение модели...";
-                var model = Importer.LoadFromBytes(modelWww.downloadHandler.data);
-                model.transform.localScale = new Vector3(-1, 1, 1);
-                var newLocation = new Location()
+                var importedModel = Importer.LoadFromBytes(modelWww.downloadHandler.data);
+                importedModel.transform.localScale = new Vector3(-1, 1, 1);
+                var newLocation = new ARLocation.Location()
                 {
-                    Latitude = currentLocation.latitude,
-                    Longitude = currentLocation.longitude,
-                    AltitudeMode =
-                    AltitudeMode.DeviceRelative
+                    Latitude = savedModel.Latitude,
+                    Longitude = savedModel.Longitude,
+                    AltitudeMode = AltitudeMode.DeviceRelative,
                 };
-                PlaceAtLocation.CreatePlacedInstance(model, newLocation, PlacementOptions, false);
+                var instance = PlaceAtLocation.CreatePlacedInstance(importedModel, newLocation, new PlaceAtLocation.PlaceAtOptions(), false);
 
                 InputField.SetTextWithoutNotify("");
                 loading = false;

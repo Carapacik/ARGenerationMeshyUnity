@@ -8,8 +8,7 @@ public class MenuNavigation : MonoBehaviour
         SceneManager.LoadScene("MenuScene", LoadSceneMode.Single);
     }
 
-    public void GoProfile()
-    { }
+    public void GoProfile() { }
 
     public void GoMap()
     {

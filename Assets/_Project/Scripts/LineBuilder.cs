@@ -38,7 +38,7 @@ public class LineBuilder : MonoBehaviour
     {
         // if (go != null)
         // {
-            go.Destroy();
+        go.Destroy();
         // }
     }
 
@@ -64,7 +64,8 @@ public class LineBuilder : MonoBehaviour
         meshRenderer.sharedMaterial = Material;
     }
 
-    public static void BuildLineMesh(List<Vector2> points, Mesh mesh, float width) {
+    public static void BuildLineMesh(List<Vector2> points, Mesh mesh, float width)
+    {
         var vertices = new List<Vector3>();
         var normals = new List<Vector3>();
         var indices = new List<int>();
@@ -94,26 +95,28 @@ public class LineBuilder : MonoBehaviour
             normals.Add(Vector3.up);
             normals.Add(Vector3.up);
 
-            indices.AddRange(new int[] { ic ,ic+ 1,ic+ 2,ic+ 1,ic+ 3,ic+ 2 });
+            indices.AddRange(new int[] { ic, ic + 1, ic + 2, ic + 1, ic + 3, ic + 2 });
             ic += 4;
         }
 
-        for (var i = 0; i < points.Count - 2; i+= 1) {
+        for (var i = 0; i < points.Count - 2; i += 1)
+        {
             var firstRight = vertices[4 * i + 3];
             var firstLeft = vertices[4 * i + 2];
-            var secondLeft = vertices[4 * (i+1)];
-            var secondRight = vertices[4 * (i+1) + 1];
+            var secondLeft = vertices[4 * (i + 1)];
+            var secondRight = vertices[4 * (i + 1) + 1];
 
             var center = (firstRight + firstLeft) / 2;
 
-            vertices.AddRange(new Vector3[]{center, firstRight, secondRight});
-            vertices.AddRange(new Vector3[]{center, secondLeft, firstLeft});
+            vertices.AddRange(new Vector3[] { center, firstRight, secondRight });
+            vertices.AddRange(new Vector3[] { center, secondLeft, firstLeft });
 
-            for (var k = 0; k < 6;k++) {
+            for (var k = 0; k < 6; k++)
+            {
                 normals.Add(Vector3.up);
             }
 
-            indices.AddRange(new int[]{ ic, ic + 1, ic +2, ic+3, ic+4, ic+5 });
+            indices.AddRange(new int[] { ic, ic + 1, ic + 2, ic + 3, ic + 4, ic + 5 });
             ic += 6;
         }
 

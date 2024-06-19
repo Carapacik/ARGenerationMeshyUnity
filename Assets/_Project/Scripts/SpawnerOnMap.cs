@@ -11,30 +11,31 @@ public class SpawnerOnMap : MonoBehaviour
     Vector2d[] _locations;
 
     [SerializeField]
-    float _spawnScale = 100f;
+    float _spawnScale = 1f;
 
     [SerializeField]
     GameObject _markerPrefab;
 
     List<GameObject> _spawnedObjects;
 
-    void Start()
+    private void Start()
     {
         // mock placemarks
         List<SavedModel> models = new List<SavedModel>() {
                 new SavedModel() {
-                    Latitude = 56.640848,
-                    Longitude = 47.913448,
+                    Latitude = 56.630848,
+                    Longitude = 47.890566,
                 }
             };
-        if (PlayerPrefs.HasKey("MODELS"))
+        if (PlayerPrefs.HasKey("saved_models"))
         {
-            models = new List<SavedModel>(PlayerPrefs.GetString("MODELS").Split(',').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
+            models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
         }
         _locations = new Vector2d[models.Count];
         _spawnedObjects = new List<GameObject>();
         for (int i = 0; i < models.Count; i++)
         {
+            Debug.Log($"SavedModel: {models[i].Latitude} {models[i].Longitude} {models[i].SavedPath}");
             _locations[i] = new Vector2d(models[i].Latitude, models[i].Longitude);
             var instance = Instantiate(_markerPrefab);
             instance.transform.localPosition = _map.GeoToWorldPosition(_locations[i], true);

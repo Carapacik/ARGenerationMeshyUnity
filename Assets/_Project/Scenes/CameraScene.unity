@@ -372,7 +372,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &103239448
 MonoBehaviour:
@@ -1019,7 +1019,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &627780776
 GameObject:
@@ -2280,84 +2280,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1417064803}
   m_CullTransparentMesh: 1
---- !u!1 &1486533602
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1486533604}
-  - component: {fileID: 1486533603}
-  m_Layer: 0
-  m_Name: PlaceAtLocations
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1486533603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1486533602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c56c9eb6d14e4854b316f59e1296fb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Locations:
-  - LocationInput:
-      LocationInputType: 1
-      LocationData: {fileID: 11400000, guid: 02ee5e625347ced43aa5f15f5d957c68, type: 2}
-      Location:
-        Latitude: 0
-        Longitude: 0
-        Altitude: 0
-        AltitudeMode: 0
-        Label: 
-      OverrideAltitudeData:
-        OverrideAltitude: 0
-        Altitude: 0
-        AltitudeMode: 0
-  - LocationInput:
-      LocationInputType: 1
-      LocationData: {fileID: 11400000, guid: 67c8a0b3305744a4a8e153e118d3560c, type: 2}
-      Location:
-        Latitude: 0
-        Longitude: 0
-        Altitude: 0
-        AltitudeMode: 0
-        Label: 
-      OverrideAltitudeData:
-        OverrideAltitude: 0
-        Altitude: 0
-        AltitudeMode: 0
-  PlacementOptions:
-    MovementSmoothing: 0.1
-    MaxNumberOfLocationUpdates: 7
-    UseMovingAverage: 0
-    HideObjectUntilItIsPlaced: 1
-    ShowObjectAfterThisManyUpdates: 1
-  Prefab: {fileID: 2198125378339800612, guid: 987dd04d41b1fcf4a9ed5ade4d053c88, type: 3}
-  DebugMode: 1
---- !u!4 &1486533604
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1486533602}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.37200636, y: 2.2257295, z: -0.9370117}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1679384459
 GameObject:
   m_ObjectHideFlags: 0

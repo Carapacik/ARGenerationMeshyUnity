@@ -7,7 +7,7 @@ public class LikeController : MonoBehaviour
     public Text TextObject;
 
 
-    void Update()
+    private void Update()
     {
         TextObject.text = LikesCount.ToString();
     }

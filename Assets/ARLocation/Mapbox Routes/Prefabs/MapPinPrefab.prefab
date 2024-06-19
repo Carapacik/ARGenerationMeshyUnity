@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51b3b252af07e4f9fa2975be76df6635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 50
+  rotationSpeed: 40
   amplitude: 2
   frequency: 0.5
 --- !u!65 &-4471682763361163509
@@ -105,8 +105,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 4.7745867, y: 7.8219805, z: 2.9080334}
+  m_Center: {x: 0.072710514, y: 4.4109893, z: 0.045983315}
 --- !u!1001 &3485137128492312149
 PrefabInstance:
   m_ObjectHideFlags: 0

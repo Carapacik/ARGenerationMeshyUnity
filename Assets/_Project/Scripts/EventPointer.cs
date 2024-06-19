@@ -8,7 +8,7 @@ public class EventPointer : MonoBehaviour
     [SerializeField] float frequency = 0.5f;
 
 
-    void Update()
+    private void Update()
     {
         RotatePointer();
     }
@@ -16,10 +16,10 @@ public class EventPointer : MonoBehaviour
     void RotatePointer()
     {
         transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, (Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude) + 15, transform.position.z);
+        transform.position = new Vector3(transform.position.x, (Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude) + 35, transform.position.z);
     }
 
-    private void OnMouseDown()
+    void OnMouseDown()
     {
         SceneManager.LoadScene("LikeScene", LoadSceneMode.Single);
     }
