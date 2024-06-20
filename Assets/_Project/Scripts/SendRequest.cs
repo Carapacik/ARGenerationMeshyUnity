@@ -32,17 +32,17 @@ public class SendRequest : MonoBehaviour
             models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
         if (models.Count == 0) return;
 
-        var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.LatitudeLongitude;
-        var nearestModel = LocationHelper.FindNearestModel(currentLocation[0], currentLocation[1], models);
+        var currentLocation = ARLocationProvider.Instance.Provider.CurrentLocation;
+        var nearestModel = LocationHelper.FindNearestModel(currentLocation.latitude, currentLocation.longitude, models);
         Debug.Log($"{nearestModel.Latitude} {nearestModel.Longitude}  {nearestModel.SavedPath}");
         byte[] file = File.ReadAllBytes(nearestModel.SavedPath);
         var arObject = Importer.LoadFromBytes(file);
-        arObject.transform.localScale = new Vector3(-0.6f, 0.6f, 0.6f);
+        var scale = arObject.transform.localScale;
+        arObject.transform.localScale = new Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
         var newLocation = new ARLocation.Location()
         {
             Latitude = nearestModel.Latitude,
-            Longitude = nearestModel.Longitude,
-            AltitudeMode = AltitudeMode.DeviceRelative
+            Longitude = nearestModel.Longitude
         };
         PlaceAtLocation.CreatePlacedInstance(arObject, newLocation, new PlaceAtLocation.PlaceAtOptions(), false);
 
@@ -121,7 +121,7 @@ public class SendRequest : MonoBehaviour
                 Debug.Log(savedPath);
                 File.WriteAllBytes(savedPath, modelWww.downloadHandler.data);
                 var models = new List<SavedModel>();
-                var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.LatitudeLongitude;
+                var currentLocation = ARLocationProvider.Instance.Provider.CurrentLocation;
                 if (PlayerPrefs.HasKey("saved_models"))
                 {
                     models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
@@ -129,8 +129,8 @@ public class SendRequest : MonoBehaviour
                 var savedModel = new SavedModel()
                 {
                     SavedPath = savedPath,
-                    Latitude = currentLocation[0],
-                    Longitude = currentLocation[1],
+                    Latitude = currentLocation.latitude,
+                    Longitude = currentLocation.longitude,
                 };
                 models.Add(savedModel);
                 var list = String.Join("|", models.Select((e) => JsonUtility.ToJson(e)));
@@ -139,12 +139,12 @@ public class SendRequest : MonoBehaviour
 
                 LoadingText.text = "Отображение модели...";
                 var importedModel = Importer.LoadFromBytes(modelWww.downloadHandler.data);
-                importedModel.transform.localScale = new Vector3(-0.6f, 0.6f, 0.6f);
+                var scale = importedModel.transform.localScale;
+                importedModel.transform.localScale = new Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
                 var newLocation = new ARLocation.Location()
                 {
                     Latitude = savedModel.Latitude,
-                    Longitude = savedModel.Longitude,
-                    AltitudeMode = AltitudeMode.DeviceRelative,
+                    Longitude = savedModel.Longitude
                 };
                 var instance = PlaceAtLocation.CreatePlacedInstance(importedModel, newLocation, new PlaceAtLocation.PlaceAtOptions(), false);
 
