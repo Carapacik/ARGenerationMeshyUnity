@@ -37,7 +37,7 @@ public class SendRequest : MonoBehaviour
         Debug.Log($"{nearestModel.Latitude} {nearestModel.Longitude}  {nearestModel.SavedPath}");
         byte[] file = File.ReadAllBytes(nearestModel.SavedPath);
         var arObject = Importer.LoadFromBytes(file);
-        arObject.transform.localScale = new Vector3(-1, 1, 1);
+        arObject.transform.localScale = new Vector3(-0.6f, 0.6f, 0.6f);
         var newLocation = new ARLocation.Location()
         {
             Latitude = nearestModel.Latitude,
@@ -139,7 +139,7 @@ public class SendRequest : MonoBehaviour
 
                 LoadingText.text = "Отображение модели...";
                 var importedModel = Importer.LoadFromBytes(modelWww.downloadHandler.data);
-                importedModel.transform.localScale = new Vector3(-1, 1, 1);
+                importedModel.transform.localScale = new Vector3(-0.6f, 0.6f, 0.6f);
                 var newLocation = new ARLocation.Location()
                 {
                     Latitude = savedModel.Latitude,
