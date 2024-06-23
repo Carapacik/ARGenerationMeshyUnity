@@ -11,7 +11,7 @@ Add from `Package manager`
 
 Install `GLTFUtility`
 
-Only `MapBox` folder from (https://docs.mapbox.com/unity/maps/guides/](https://www.mapbox.com/install/unity)
+Only `MapBox` folder from  [MapBox Unity SDK](https://docs.mapbox.com/unity/maps/guides/)
 
 Add `AR + GPS Location` v3.8.0(find on internet)
 
