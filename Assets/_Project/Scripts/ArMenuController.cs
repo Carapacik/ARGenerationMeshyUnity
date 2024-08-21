@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
+using ARLocation.MapboxRoutes;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace ARLocation.MapboxRoutes.SampleProject
+namespace _Project.Scripts
 {
     public class Tween
     {
-        Vector3 start;
-        Vector3 end;
-        Vector3 current;
-        float speed;
-        float t;
-
-        public Vector3 Position => current;
+        private readonly Vector3 end;
+        private readonly float speed;
+        private readonly Vector3 start;
+        private float t;
 
         public Tween(Vector3 startPos, Vector3 endPos, float tweenSpeed = 1)
         {
@@ -22,16 +21,15 @@ namespace ARLocation.MapboxRoutes.SampleProject
             speed = tweenSpeed;
         }
 
+        public Vector3 Position { get; private set; }
+
         public bool Update()
         {
-            current = start * (1 - t) + end * t;
+            Position = start * (1 - t) + end * t;
 
             t += Time.deltaTime * speed;
 
-            if (t > 1)
-            {
-                return true;
-            }
+            if (t > 1) return true;
 
             return false;
         }
@@ -39,11 +37,11 @@ namespace ARLocation.MapboxRoutes.SampleProject
 
     public class TweenRectTransform
     {
-        public RectTransform Rt;
-        public Vector3 PositionStart;
         public Vector3 PositionEnd;
-        public Quaternion RotationStart;
+        public Vector3 PositionStart;
         public Quaternion RotationEnd;
+        public Quaternion RotationStart;
+        public RectTransform Rt;
 
         public TweenRectTransform(RectTransform rectTransform, Vector3 targetPosition, Quaternion targetRotation)
         {
@@ -61,13 +59,14 @@ namespace ARLocation.MapboxRoutes.SampleProject
         {
             Linear,
             EaseOutBack,
-            EaseInCubic,
+            EaseInCubic
         }
 
+        private readonly Func<float, float, float, float> easeFunc;
+        private readonly float speed;
+
         public List<TweenRectTransform> Elements = new List<TweenRectTransform>();
-        float speed;
-        float t;
-        Func<float, float, float, float> easeFunc;
+        private float t;
 
         public TweenRectTransformGroup(float speed, EaseFunc easeFuncType)
         {
@@ -76,24 +75,24 @@ namespace ARLocation.MapboxRoutes.SampleProject
             switch (easeFuncType)
             {
                 case EaseFunc.EaseOutBack:
-                    this.easeFunc = EaseOutBack;
+                    easeFunc = EaseOutBack;
                     break;
 
                 case EaseFunc.EaseInCubic:
-                    this.easeFunc = EaseInCubic;
+                    easeFunc = EaseInCubic;
                     break;
 
                 case EaseFunc.Linear:
-                    this.easeFunc = EaseLinear;
+                    easeFunc = EaseLinear;
                     break;
             }
         }
 
-        public Vector3 ease(Vector3 start, Vector3 end, float t)
+        public Vector3 Ease(Vector3 start, Vector3 end, float time)
         {
-            var x = easeFunc(start.x, end.x, t);
-            var y = easeFunc(start.y, end.y, t);
-            var z = easeFunc(start.z, end.z, t);
+            var x = easeFunc(start.x, end.x, time);
+            var y = easeFunc(start.y, end.y, time);
+            var z = easeFunc(start.z, end.z, time);
 
             return new Vector3(x, y, z);
         }
@@ -102,7 +101,8 @@ namespace ARLocation.MapboxRoutes.SampleProject
         {
             foreach (var e in Elements)
             {
-                e.Rt.position = ease(e.PositionStart, e.PositionEnd, t); //e.PositionStart * (1 - t) + e.PositionEnd * t;
+                e.Rt.position =
+                    Ease(e.PositionStart, e.PositionEnd, t); //e.PositionStart * (1 - t) + e.PositionEnd * t;
                 e.Rt.rotation = Quaternion.Lerp(e.RotationStart, e.RotationEnd, t);
             }
 
@@ -124,17 +124,17 @@ namespace ARLocation.MapboxRoutes.SampleProject
 
         public static float EaseOutBack(float start, float end, float value)
         {
-            float s = 1.70158f;
+            var s = 1.70158f;
             end -= start;
-            value = (value) - 1;
-            return end * ((value) * value * ((s + 1) * value + s) + 1) + start;
+            value = value - 1;
+            return end * (value * value * ((s + 1) * value + s) + 1) + start;
         }
 
         public static Vector3 EaseOutBack(Vector3 start, Vector3 end, float t)
         {
-            float x = EaseOutBack(start.x, end.x, t);
-            float y = EaseOutBack(start.y, end.y, t);
-            float z = EaseOutBack(start.z, end.z, t);
+            var x = EaseOutBack(start.x, end.x, t);
+            var y = EaseOutBack(start.y, end.y, t);
+            var z = EaseOutBack(start.z, end.z, t);
 
             return new Vector3(x, y, z);
         }
@@ -149,7 +149,6 @@ namespace ARLocation.MapboxRoutes.SampleProject
         {
             return start * (1 - value) * end * value;
         }
-
     }
 
     public class ArMenuController : MonoBehaviour
@@ -160,44 +159,6 @@ namespace ARLocation.MapboxRoutes.SampleProject
             Open,
             OpenTransition,
             CloseTransition
-        }
-
-        [System.Serializable]
-        public class StateData
-        {
-            public StateType CurrentState = StateType.Closed;
-            public TweenRectTransformGroup tweenGroup;
-        }
-
-        [System.Serializable]
-        public class ElementsData
-        {
-            public Button BtnToggle;
-            public Button BtnNext;
-            public Button BtnPrev;
-            public Button BtnRestart;
-            public Button BtnExit;
-            public Button BtnLineRender;
-
-            public Text LabelNext;
-            public Text LabelPrev;
-            public Text LabelRestart;
-            public Text LabelSearch;
-            public Text LabelTargetRender;
-
-            public RectTransform TargetNext;
-            public RectTransform TargetPrev;
-            public RectTransform TargetRestart;
-            public RectTransform TargetExit;
-            public RectTransform TargetLineRender;
-        }
-
-        [System.Serializable]
-        public class SettingsData
-        {
-            public MapboxRoute MapboxRoute;
-            public MenuController MenuController;
-            public float TransitionSpeed = 2.0f;
         }
 
         public SettingsData Settings;
@@ -211,24 +172,33 @@ namespace ARLocation.MapboxRoutes.SampleProject
             showOnlyToggleButton();
         }
 
-        void showOnlyToggleButton()
+        private void Start()
         {
-            Elements.BtnExit.gameObject.SetActive(false);
-            Elements.BtnLineRender.gameObject.SetActive(false);
-            Elements.BtnNext.gameObject.SetActive(false);
-            Elements.BtnPrev.gameObject.SetActive(false);
-            Elements.BtnRestart.gameObject.SetActive(false);
-            Elements.BtnToggle.gameObject.SetActive(true);
         }
 
-        void showAllButtons()
+        private void Update()
         {
-            Elements.BtnExit.gameObject.SetActive(true);
-            Elements.BtnLineRender.gameObject.SetActive(true);
-            Elements.BtnNext.gameObject.SetActive(true);
-            Elements.BtnPrev.gameObject.SetActive(true);
-            Elements.BtnRestart.gameObject.SetActive(true);
-            Elements.BtnToggle.gameObject.SetActive(true);
+            switch (s.currentState)
+            {
+                case StateType.OpenTransition:
+                    if (s.TweenGroup.Update())
+                    {
+                        showButtonLabels();
+                        s.currentState = StateType.Open;
+                    }
+
+                    break;
+
+                case StateType.CloseTransition:
+                    if (s.TweenGroup.Update())
+                    {
+                        hideButtonLabels();
+                        showOnlyToggleButton();
+                        s.currentState = StateType.Closed;
+                    }
+
+                    break;
+            }
         }
 
         public void OnEnable()
@@ -253,19 +223,34 @@ namespace ARLocation.MapboxRoutes.SampleProject
             Elements.BtnLineRender.onClick.RemoveListener(OnSearchPress);
         }
 
+        private void showOnlyToggleButton()
+        {
+            Elements.BtnExit.gameObject.SetActive(false);
+            Elements.BtnLineRender.gameObject.SetActive(false);
+            Elements.BtnNext.gameObject.SetActive(false);
+            Elements.BtnPrev.gameObject.SetActive(false);
+            Elements.BtnRestart.gameObject.SetActive(false);
+            Elements.BtnToggle.gameObject.SetActive(true);
+        }
+
+        private void showAllButtons()
+        {
+            Elements.BtnExit.gameObject.SetActive(true);
+            Elements.BtnLineRender.gameObject.SetActive(true);
+            Elements.BtnNext.gameObject.SetActive(true);
+            Elements.BtnPrev.gameObject.SetActive(true);
+            Elements.BtnRestart.gameObject.SetActive(true);
+            Elements.BtnToggle.gameObject.SetActive(true);
+        }
+
         private void updateLineRenderButtonLabel()
         {
             var mc = Settings.MenuController;
 
             if (mc.PathRendererType == MenuController.LineType.Route)
-            {
                 Elements.LabelTargetRender.text = "Route Path";
-            }
             else
-            {
                 Elements.LabelTargetRender.text = "Line To Target";
-            }
-
         }
 
         private void OnLineRenderPress()
@@ -310,35 +295,38 @@ namespace ARLocation.MapboxRoutes.SampleProject
             toggleMenu();
         }
 
-        void toggleMenu()
+        private void toggleMenu()
         {
-            if (s.CurrentState == StateType.Closed)
-            {
+            if (s.currentState == StateType.Closed)
                 openMenu();
-            }
-            else if (s.CurrentState == StateType.Open)
-            {
-                closeMenu();
-            }
+            else if (s.currentState == StateType.Open) closeMenu();
         }
 
-        void openMenu()
+        private void openMenu()
         {
-            switch (s.CurrentState)
+            switch (s.currentState)
             {
                 case StateType.Closed:
 
                     showAllButtons();
 
-                    s.tweenGroup = new TweenRectTransformGroup(Settings.TransitionSpeed, TweenRectTransformGroup.EaseFunc.EaseInCubic);
+                    s.TweenGroup = new TweenRectTransformGroup(Settings.TransitionSpeed,
+                        TweenRectTransformGroup.EaseFunc.EaseInCubic);
 
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnNext.GetComponent<RectTransform>(), Elements.TargetNext.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnPrev.GetComponent<RectTransform>(), Elements.TargetPrev.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnRestart.GetComponent<RectTransform>(), Elements.TargetRestart.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnExit.GetComponent<RectTransform>(), Elements.TargetExit.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnLineRender.GetComponent<RectTransform>(), Elements.TargetLineRender.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnNext.GetComponent<RectTransform>(),
+                        Elements.TargetNext.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnPrev.GetComponent<RectTransform>(),
+                        Elements.TargetPrev.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnRestart.GetComponent<RectTransform>(),
+                        Elements.TargetRestart.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnExit.GetComponent<RectTransform>(),
+                        Elements.TargetExit.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(
+                        Elements.BtnLineRender.GetComponent<RectTransform>(), Elements.TargetLineRender.position,
+                        Quaternion.identity));
 
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnToggle.GetComponent<RectTransform>(), Elements.BtnToggle.GetComponent<RectTransform>().position, Quaternion.Euler(0, 0, 180)));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnToggle.GetComponent<RectTransform>(),
+                        Elements.BtnToggle.GetComponent<RectTransform>().position, Quaternion.Euler(0, 0, 180)));
 
                     //s.BtnNextTween = new Tween(Elements.BtnNext.GetComponent<RectTransform>().position, Elements.TargetNext.position, Settings.TransitionSpeed);
                     //s.BtnPrevTween = new Tween(Elements.BtnPrev.GetComponent<RectTransform>().position, Elements.TargetPrev.position, Settings.TransitionSpeed);
@@ -347,33 +335,40 @@ namespace ARLocation.MapboxRoutes.SampleProject
 
                     Elements.BtnToggle.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, 180);
 
-                    s.CurrentState = StateType.OpenTransition;
+                    s.currentState = StateType.OpenTransition;
 
                     break;
             }
         }
 
-        void closeMenu()
+        private void closeMenu()
         {
-            switch (s.CurrentState)
+            switch (s.currentState)
             {
                 case StateType.Open:
 
-                    s.tweenGroup = new TweenRectTransformGroup(Settings.TransitionSpeed, TweenRectTransformGroup.EaseFunc.EaseInCubic);
+                    s.TweenGroup = new TweenRectTransformGroup(Settings.TransitionSpeed,
+                        TweenRectTransformGroup.EaseFunc.EaseInCubic);
 
                     var togglerRt = Elements.BtnToggle.GetComponent<RectTransform>();
 
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnNext.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnPrev.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnRestart.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnExit.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnLineRender.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnNext.GetComponent<RectTransform>(),
+                        togglerRt.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnPrev.GetComponent<RectTransform>(),
+                        togglerRt.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnRestart.GetComponent<RectTransform>(),
+                        togglerRt.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnExit.GetComponent<RectTransform>(),
+                        togglerRt.position, Quaternion.identity));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(
+                        Elements.BtnLineRender.GetComponent<RectTransform>(), togglerRt.position, Quaternion.identity));
 
-                    s.tweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnToggle.GetComponent<RectTransform>(), Elements.BtnToggle.GetComponent<RectTransform>().position, Quaternion.Euler(0, 0, 0)));
+                    s.TweenGroup.Elements.Add(new TweenRectTransform(Elements.BtnToggle.GetComponent<RectTransform>(),
+                        Elements.BtnToggle.GetComponent<RectTransform>().position, Quaternion.Euler(0, 0, 0)));
 
                     //Elements.BtnToggle.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, 0);
 
-                    s.CurrentState = StateType.CloseTransition;
+                    s.currentState = StateType.CloseTransition;
 
                     //showOnlyToggleButton();
                     //var pos = Elements.BtnToggle.GetComponent<RectTransform>().position;
@@ -387,12 +382,7 @@ namespace ARLocation.MapboxRoutes.SampleProject
             }
         }
 
-        void Start()
-        {
-
-        }
-
-        void showButtonLabels()
+        private void showButtonLabels()
         {
             Elements.LabelNext.gameObject.SetActive(true);
             Elements.LabelPrev.gameObject.SetActive(true);
@@ -401,37 +391,50 @@ namespace ARLocation.MapboxRoutes.SampleProject
             Elements.LabelTargetRender.gameObject.SetActive(true);
         }
 
-        void hideButtonLabels()
+        private void hideButtonLabels()
         {
             Elements.LabelNext.gameObject.SetActive(false);
             Elements.LabelPrev.gameObject.SetActive(false);
             Elements.LabelRestart.gameObject.SetActive(false);
             Elements.LabelTargetRender.gameObject.SetActive(false);
-
         }
 
-        void Update()
+        [Serializable]
+        public class StateData
         {
-            switch (s.CurrentState)
-            {
-                case StateType.OpenTransition:
-                    if (s.tweenGroup.Update())
-                    {
-                        showButtonLabels();
-                        s.CurrentState = StateType.Open;
-                    }
+            [FormerlySerializedAs("CurrentState")] public StateType currentState = StateType.Closed;
+            public TweenRectTransformGroup TweenGroup;
+        }
 
-                    break;
+        [Serializable]
+        public class ElementsData
+        {
+            public Button BtnToggle;
+            public Button BtnNext;
+            public Button BtnPrev;
+            public Button BtnRestart;
+            public Button BtnExit;
+            public Button BtnLineRender;
 
-                case StateType.CloseTransition:
-                    if (s.tweenGroup.Update())
-                    {
-                        hideButtonLabels();
-                        showOnlyToggleButton();
-                        s.CurrentState = StateType.Closed;
-                    }
-                    break;
-            }
+            public Text LabelNext;
+            public Text LabelPrev;
+            public Text LabelRestart;
+            public Text LabelSearch;
+            public Text LabelTargetRender;
+
+            public RectTransform TargetNext;
+            public RectTransform TargetPrev;
+            public RectTransform TargetRestart;
+            public RectTransform TargetExit;
+            public RectTransform TargetLineRender;
+        }
+
+        [Serializable]
+        public class SettingsData
+        {
+            public MapboxRoute MapboxRoute;
+            public MenuController MenuController;
+            public float TransitionSpeed = 2.0f;
         }
     }
 }

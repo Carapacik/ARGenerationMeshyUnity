@@ -1,28 +1,29 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class LikeController : MonoBehaviour
+namespace _Project.Scripts
 {
-    public int LikesCount = 0;
-    public Text TextObject;
-
-
-    private void Update()
+    public class LikeController : MonoBehaviour
     {
-        TextObject.text = LikesCount.ToString();
-    }
+        [FormerlySerializedAs("LikesCount")] public int likesCount;
+        [FormerlySerializedAs("TextObject")] public Text textObject;
 
-    public void AddLike()
-    {
-        LikesCount = LikesCount + 1;
-    }
 
-    public void RemoveLike()
-    {
-        if (LikesCount == 0)
+        private void Update()
         {
-            return;
+            textObject.text = likesCount.ToString();
         }
-        LikesCount = LikesCount - 1;
+
+        public void AddLike()
+        {
+            likesCount = likesCount + 1;
+        }
+
+        public void RemoveLike()
+        {
+            if (likesCount == 0) return;
+            likesCount = likesCount - 1;
+        }
     }
 }

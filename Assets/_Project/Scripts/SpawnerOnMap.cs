@@ -1,58 +1,64 @@
-using UnityEngine;
-using Mapbox.Utils;
-using Mapbox.Unity.Map;
 using System.Collections.Generic;
 using System.Linq;
+using Mapbox.Unity.Map;
+using Mapbox.Utils;
+using UnityEngine;
+using UnityEngine.Serialization;
 
-public class SpawnerOnMap : MonoBehaviour
+namespace _Project.Scripts
 {
-    [SerializeField]
-    AbstractMap _map;
-    Vector2d[] _locations;
-
-    [SerializeField]
-    float _spawnScale = 1f;
-
-    [SerializeField]
-    GameObject _markerPrefab;
-
-    List<GameObject> _spawnedObjects;
-
-    private void Start()
+    public class SpawnerOnMap : MonoBehaviour
     {
-        // mock placemarks
-        List<SavedModel> models = new List<SavedModel>() {
-                new SavedModel() {
-                    Latitude = 56.630848,
-                    Longitude = 47.890566,
+        [FormerlySerializedAs("_map")] [SerializeField]
+        private AbstractMap map;
+
+        [FormerlySerializedAs("_spawnScale")] [SerializeField]
+        private float spawnScale = 1f;
+
+        [FormerlySerializedAs("_markerPrefab")] [SerializeField]
+        private GameObject markerPrefab;
+
+        private Vector2d[] _locations;
+
+        private List<GameObject> _spawnedObjects;
+
+        private void Start()
+        {
+            // mock place marks
+            var models = new List<SavedModel>
+            {
+                new SavedModel
+                {
+                    latitude = 56.630848,
+                    longitude = 47.890566
                 }
             };
-        if (PlayerPrefs.HasKey("saved_models"))
-        {
-            models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|').Select((e) => JsonUtility.FromJson<SavedModel>(e)));
+            if (PlayerPrefs.HasKey("saved_models"))
+                models = new List<SavedModel>(PlayerPrefs.GetString("saved_models").Split('|')
+                    .Select(JsonUtility.FromJson<SavedModel>));
+            _locations = new Vector2d[models.Count];
+            _spawnedObjects = new List<GameObject>();
+            for (var i = 0; i < models.Count; i++)
+            {
+                Debug.Log($"SavedModel: {models[i].latitude} {models[i].longitude} {models[i].savedPath}");
+                _locations[i] = new Vector2d(models[i].latitude, models[i].longitude);
+                var instance = Instantiate(markerPrefab);
+                instance.transform.localPosition = map.GeoToWorldPosition(_locations[i]);
+                instance.transform.localScale = new Vector3(spawnScale, spawnScale, spawnScale);
+                _spawnedObjects.Add(instance);
+            }
         }
-        _locations = new Vector2d[models.Count];
-        _spawnedObjects = new List<GameObject>();
-        for (int i = 0; i < models.Count; i++)
-        {
-            Debug.Log($"SavedModel: {models[i].Latitude} {models[i].Longitude} {models[i].SavedPath}");
-            _locations[i] = new Vector2d(models[i].Latitude, models[i].Longitude);
-            var instance = Instantiate(_markerPrefab);
-            instance.transform.localPosition = _map.GeoToWorldPosition(_locations[i], true);
-            instance.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
-            _spawnedObjects.Add(instance);
-        }
-    }
 
-    private void Update()
-    {
-        int count = _spawnedObjects.Count;
-        for (int i = 0; i < count; i++)
+        private void Update()
         {
-            var spawnedObject = _spawnedObjects[i];
-            var location = _locations[i];
-            spawnedObject.transform.localPosition = _map.GeoToWorldPosition(location, true);
-            spawnedObject.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
+            var count = _spawnedObjects.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var spawnedObject = _spawnedObjects[i];
+                var location = _locations[i];
+                spawnedObject.transform.localPosition = map.GeoToWorldPosition(location);
+                spawnedObject.transform.localScale = new Vector3(spawnScale, spawnScale, spawnScale);
+            }
         }
     }
 }

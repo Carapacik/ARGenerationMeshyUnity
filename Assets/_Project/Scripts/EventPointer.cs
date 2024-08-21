@@ -1,26 +1,30 @@
-using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class EventPointer : MonoBehaviour
+namespace _Project.Scripts
 {
-    [SerializeField] float rotationSpeed = 50f;
-    [SerializeField] float amplitude = 2.0f;
-    [SerializeField] float frequency = 0.5f;
-
-
-    private void Update()
+    public class EventPointer : MonoBehaviour
     {
-        RotatePointer();
-    }
+        [SerializeField] private float rotationSpeed = 50f;
+        [SerializeField] private float amplitude = 2.0f;
+        [SerializeField] private float frequency = 0.5f;
 
-    void RotatePointer()
-    {
-        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, (Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude) + 35, transform.position.z);
-    }
 
-    void OnMouseDown()
-    {
-        SceneManager.LoadScene("LikeScene", LoadSceneMode.Single);
+        private void Update()
+        {
+            RotatePointer();
+        }
+
+        private void OnMouseDown()
+        {
+            SceneManager.LoadScene("LikeScene", LoadSceneMode.Single);
+        }
+
+        private void RotatePointer()
+        {
+            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+            transform.position = new Vector3(transform.position.x,
+                Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude + 35, transform.position.z);
+        }
     }
 }

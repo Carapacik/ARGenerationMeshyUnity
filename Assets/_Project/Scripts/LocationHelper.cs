@@ -1,61 +1,63 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
-public class LocationHelper
+namespace _Project.Scripts
 {
-    private const double EarthRadius = 6371; // Радиус Земли в километрах
-
-    public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    public static class LocationHelper
     {
-        // Преобразуем градусы в радианы
-        lat1 = ToRadians(lat1);
-        lon1 = ToRadians(lon1);
-        lat2 = ToRadians(lat2);
-        lon2 = ToRadians(lon2);
+        private const double EarthRadius = 6371; // Радиус Земли в километрах
 
-        // Вычисляем разницу широт и долгот
-        double dLat = lat2 - lat1;
-        double dLon = lon2 - lon1;
-
-        // Применяем формулу Хаверсина
-        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                   Math.Cos(lat1) * Math.Cos(lat2) *
-                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
-        // Возвращаем расстояние в километрах
-        return EarthRadius * c;
-    }
-
-    public static SavedModel FindNearestModel(double latitude, double longitude, List<SavedModel> models)
-    {
-        SavedModel nearestElement = null;
-        double minDistance = double.MaxValue;
-
-        foreach (var m in models)
+        private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
         {
-            double distanceToElement = CalculateDistance(latitude, longitude, m.Latitude, m.Longitude);
+            // Преобразуем градусы в радианы
+            lat1 = ToRadians(lat1);
+            lon1 = ToRadians(lon1);
+            lat2 = ToRadians(lat2);
+            lon2 = ToRadians(lon2);
 
-            if (distanceToElement < minDistance)
+            // Вычисляем разницу широт и долгот
+            var dLat = lat2 - lat1;
+            var dLon = lon2 - lon1;
+
+            // Применяем формулу Хаверсина
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(lat1) * Math.Cos(lat2) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            // Возвращаем расстояние в километрах
+            return EarthRadius * c;
+        }
+
+        public static SavedModel FindNearestModel(double latitude, double longitude, List<SavedModel> models)
+        {
+            SavedModel nearestElement = null;
+            var minDistance = double.MaxValue;
+
+            foreach (var m in models)
             {
+                var distanceToElement = CalculateDistance(latitude, longitude, m.latitude, m.longitude);
+
+                if (!(distanceToElement < minDistance)) continue;
                 minDistance = distanceToElement;
                 nearestElement = m;
             }
+
+            return nearestElement;
         }
 
-        return nearestElement;
+        private static double ToRadians(double degrees)
+        {
+            return degrees * Math.PI / 180;
+        }
     }
 
-    private static double ToRadians(double degrees)
+    [Serializable]
+    public class SavedModel
     {
-        return degrees * Math.PI / 180;
+        [FormerlySerializedAs("SavedPath")] public string savedPath;
+        [FormerlySerializedAs("Latitude")] public double latitude;
+        [FormerlySerializedAs("Longitude")] public double longitude;
     }
-}
-
-[Serializable]
-public class SavedModel
-{
-    public string SavedPath;
-    public double Latitude;
-    public double Longitude;
 }
